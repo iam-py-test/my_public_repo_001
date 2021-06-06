@@ -1,0 +1,28 @@
+- name: Handle with Comvent
+  uses: rytswd/comvent@v0.3
+  id: comvent
+  with:
+    token: ${{ secrets.GITHUB_TOKEN }}
+    config-path: .github/comvent-chatbot.yaml
+
+# The below only runs when Comvent finds matching comment.
+# This assumes that Comvent config holding 'command-random' as a keyword.
+- if: steps.comvent.outputs.command-random != ''
+  name: Handle random event
+  uses: actions/github-script@v3
+  with:
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    # An example of responding to a comment.
+    script: |
+      const comment = `Command \`/random\` was triggered by the comment`;
+
+      github.issues.createComment({
+        issue_number: context.issue.number,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        body: comment
+      })
+
+#
+# You can repeat similar handling based on the Comvent config.
+#
